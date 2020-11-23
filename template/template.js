@@ -1,7 +1,7 @@
 /**
  * 模板编译
  */
-function complie(temp) {
+module.exports.compile = temp => {
   // 通过正则表达式获取到中间的变量
   temp = temp.replace(/\{\{(.+)\}\}/g, function () {
     const key = arguments[1].trim()
@@ -17,5 +17,3 @@ function complie(temp) {
   let tail = '`}\r\n return str'
   return new Function('obj', head + temp + tail)
 }
-
-module.exports = complie
