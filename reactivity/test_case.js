@@ -3,12 +3,12 @@ module.exports = ({ reactive, effect }) => {
     const data = reactive({
       name: 'carol',
       age: {
-        n: 5,
-      },
+        n: 5
+      }
     })
 
     // mock 一个响应函数
-    const fn = jext.fn()
+    const fn = jest.fn()
 
     // 设置响应函数
     effect(fn)
@@ -23,8 +23,8 @@ module.exports = ({ reactive, effect }) => {
   it('测试多层数据中改变时 是否被响应', () => {
     const data = reactive({
       age: {
-        n: 5,
-      },
+        n: 5
+      }
     })
     // Mock一个响应函数
     const fn = jest.fn()
@@ -41,7 +41,7 @@ module.exports = ({ reactive, effect }) => {
 
   it('测试数组中数据改变时 是否被响应', () => {
     const data = reactive({
-      ary: ['a'],
+      ary: ['a']
     })
     // Mock一个响应函数
     const fn = jest.fn()

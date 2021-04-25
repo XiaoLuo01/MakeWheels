@@ -1,24 +1,32 @@
 let effective
 
 // 副作用函数
-function effect(fn) {
-  effective = fn
+function effect (fun) {
+  effective = fun
 }
 
-const oldArrayPrototype = Array.prototype
-const proto = Object.create(oldArrayPrototype)
-;[('push', 'pop', 'shift', 'unshift', 'sort', 'splice', 'reverse')].forEach(
-  method => {
-    proto[method] = function () {
-      effective()
-      oldArrayPrototype[method].call(this, ...arguments)
-    }
+// 数组劫持
+const oldArrayProto = Array.prototype
+const proto = Object.create(oldArrayProto)
+const arrMethods = [
+  'push',
+  'pop',
+  'shift',
+  'unshift',
+  'splice',
+  'sort',
+  'reverse'
+]
+arrMethods.forEach(method => {
+  // 函数劫持
+  proto[method] = function () {
+    effective()
+    oldArrayProto[method].call(this, ...arguments)
   }
-)
+})
 
-function reactive(data) {
-  // 判断数据是不是对象
-  if (typeof data !== 'object' || data === null) {
+function reactive (data) {
+  if (typeof data !== 'object' || data == null) {
     return data
   }
 
@@ -27,9 +35,10 @@ function reactive(data) {
     data.__proto__ = proto
   }
 
+  // 遍历对象，一个一个劫持
   Object.keys(data).forEach(key => {
     let value = data[key]
-    // 如果有嵌套，递归调用
+    // 递归调用
     reactive(value)
     Object.defineProperty(data, key, {
       enumerable: false,
@@ -37,18 +46,18 @@ function reactive(data) {
       get: () => {
         return value
       },
-      set: v => {
-        if (v !== value) {
-          value = v
+      set: newVal => {
+        if (newVal !== value) {
+          effective()
+          value = newVal
         }
-      },
+      }
     })
   })
-
   return data
 }
 
 module.exports = {
   effect,
-  reactive,
+  reactive
 }

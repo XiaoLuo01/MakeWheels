@@ -1,35 +1,31 @@
 let effective
-function effect(fun) {
+function effect (fun) {
   effective = fun
 }
 
-function reactive(data) {
+function reactive (data) {
   if (typeof data !== 'object' || data == null) {
     return data
   }
 
   const observed = new Proxy(data, {
-    get(target, key, receiver) {
-      // Reflect 有返回值不报错
-      let result = Reflect.get(target, key, receiver)
-      // 多层代理
-      return typeof result !== 'object' ? result : reactive(result)
+    get (target, key, receiver) {
+      const res = Reflect.get(target, key, receiver)
+      return typeof res === 'object' ? reactive(res) : res
     },
-    set(target, key, value, receiver) {
+    set (target, key, value, receiver) {
       effective()
-      const ret = Reflect.set(target, key, value, receiver)
-      return ret
+      const res = Reflect.set(target, key, value, receiver)
+      return res
     },
-    deleteProperty(target, key) {
-      effective()
-      const ret = Reflect.deleteProperty(target, key)
-      return ret
-    },
+    deleteProperty (target, key) {
+      return Reflect.deleteProperty(target, key)
+    }
   })
   return observed
 }
 
 module.exports = {
   reactive,
-  effect,
+  effect
 }
